@@ -1,0 +1,14 @@
+= Take Home Challenge Solution for Snr Java Software Engineer position (MECASH)
+
+
+== Candidate: Temire Emmanuel
+
+
+To run your application:
+```
+./mvnw spring-boot:run
+```
+
+
+
+

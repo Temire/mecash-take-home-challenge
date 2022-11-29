@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mecashapp
+    # url: jdbc:mysql://localhost:3306/user_db
+    username: postgres
+    password: postgres
+  tomcat:
+    max-wait: 20000
+    max-active: 50
+    max-idle: 20
+    min-idle: 15
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        id:
+          new_generator_mappings: false
+
+server:
+  port: 85 # This is the default port anyway, but you can change it here
+
+security:
+  jwt:
+    token:
+      secret-key: mecash-secret-key
+      expire-length: 300000 # 5 minutes duration by default: 5 minutes * 60 seconds * 1000 miliseconds
+
+currency:
+  A: 1234567890
+  B: 6574839201
