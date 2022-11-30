@@ -1,6 +1,5 @@
 package ng.temire.mecash.utils;
 
-import jdk.vm.ci.meta.Local;
 import ng.temire.mecash.data.dto.UserAccountDTO;
 import ng.temire.mecash.data.entity.Transaction;
 import ng.temire.mecash.data.repository.TransactionRepository;
@@ -8,6 +7,7 @@ import ng.temire.mecash.rest.request.TransactionRequest;
 import ng.temire.mecash.rest.response.TransactionResponse;
 import ng.temire.mecash.service.UserAccountService;
 import ng.temire.mecash.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -19,15 +19,13 @@ import static java.lang.System.out;
 @Component
 public class ServiceUtils {
 
-    final UserAccountService accountService;
-    final UserService userService;
-    final TransactionRepository transactionRepository;
+    @Autowired
+    UserAccountService accountService;
+    @Autowired
+    UserService userService;
+    @Autowired
+    TransactionRepository transactionRepository;
 
-    public ServiceUtils(UserAccountService accountService, UserService userService, TransactionRepository transactionRepository) {
-        this.accountService = accountService;
-        this.userService = userService;
-        this.transactionRepository = transactionRepository;
-    }
 
     public boolean canBeDebited(UserAccountDTO accountDTO, double amount) {
             double balance = accountDTO.getAvailableBalance().doubleValue();

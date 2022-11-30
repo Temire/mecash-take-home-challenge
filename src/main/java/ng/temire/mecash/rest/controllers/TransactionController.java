@@ -6,6 +6,7 @@ import ng.temire.mecash.rest.request.TransactionRequest;
 import ng.temire.mecash.rest.response.GenericResponseDTO;
 import ng.temire.mecash.service.TransactionService;
 import ng.temire.mecash.service.mapper.TransactionMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,9 @@ import java.sql.Date;
 @RequiredArgsConstructor
 public class TransactionController {
 
-    private final TransactionService service;
-    private final TransactionMapper mapper;
+    @Autowired
+    TransactionService service;
+
 
     @PostMapping("/user-transactions")
     public ResponseEntity<GenericResponseDTO> retrieveUserTxns(@RequestBody TransactionRecordRequest request, Pageable pageable){

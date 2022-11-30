@@ -26,7 +26,7 @@ security:
   jwt:
     token:
       secret-key: mecash-secret-key
-      expire-length: 300000 # 5 minutes duration by default: 5 minutes * 60 seconds * 1000 miliseconds
+      expire-length: 900000 # 5 minutes duration by default: 5 minutes * 60 seconds * 1000 miliseconds
 
 currency:
   A: 1234567890

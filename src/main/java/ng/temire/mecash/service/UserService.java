@@ -10,6 +10,7 @@ import ng.temire.mecash.security.JwtTokenProvider;
 import ng.temire.mecash.security.constants.Role;
 import ng.temire.mecash.security.exceptions.CustomException;
 import ng.temire.mecash.service.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,22 +24,27 @@ import java.util.Optional;
 @Component
 public class UserService {
 
-    final UserRepository userRepository;
-    final UserMapper mapper;
+    @Autowired
+    UserRepository userRepository;
+
+    private final UserMapper mapper;
+
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
+
     private final AuthenticationManager authenticationManager;
-    final UserAccountService accountService;
 
+    @Autowired
+    UserAccountService accountService;
 
-    public UserService(UserRepository userRepository, UserMapper mapper, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, UserAccountService accountService) {
-        this.userRepository = userRepository;
+    public UserService(UserMapper mapper, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
         this.mapper = mapper;
         this.passwordEncoder = passwordEncoder;
-        this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
-        this.accountService = accountService;
     }
+
 
     public UserDTO getAppUser(String username) {
         Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
@@ -75,8 +81,9 @@ public class UserService {
             if (existsByUsername(username)) {
                 Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
                 if (auth.isAuthenticated()) {
-                    String token = jwtTokenProvider.createToken(username, getAppUser(username).getRoles());
-                    AuthResponse authResponse = new AuthResponse(getAppUser(username), token);
+                    UserDTO userDTO = getAppUser(username);
+                    String token = jwtTokenProvider.createToken(username, userDTO.getRoles());
+                    AuthResponse authResponse = new AuthResponse(userDTO, accountService.getAccountByUserId(userDTO.getId()), token);
                     return new GenericResponseDTO("00", HttpStatus.OK, "User is authenticated!", authResponse);
                 } else
                     return new GenericResponseDTO("99", HttpStatus.EXPECTATION_FAILED, "User not authenticated!.", null);
@@ -87,11 +94,11 @@ public class UserService {
         }
     }
 
-    public GenericResponseDTO signup(User appUser) {
+    public GenericResponseDTO signup(UserDTO appUser) {
         try {
-            if (!userRepository.existsByUsername(appUser.getUsername())) {
+            if (!userRepository.existsByUsername(mapper.toEntity(appUser).getUsername())) {
                 appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
-                UserDTO userDTO = save(appUser);
+                UserDTO userDTO = save(mapper.toEntity(appUser));
 
                 UserAccountDTO accountDTO = accountService.createAccount(userDTO);
                 if(accountDTO ==null){
@@ -99,13 +106,14 @@ public class UserService {
                 }
 
                 String token = jwtTokenProvider.createToken(appUser.getUsername(), userDTO.getRoles());
-                AuthResponse authResponse = new AuthResponse(userDTO, token);
+                AuthResponse authResponse = new AuthResponse(userDTO, accountDTO, token);
                 return new GenericResponseDTO("00", HttpStatus.OK, "User created Succesfully!", authResponse);
             } else {
                 throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
             }
         } catch (Exception ex) {
-            return new GenericResponseDTO("99", HttpStatus.INTERNAL_SERVER_ERROR, "Error Retrieving Records", null);
+            ex.printStackTrace();
+            return new GenericResponseDTO("99", HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), null);
         }
     }
 }

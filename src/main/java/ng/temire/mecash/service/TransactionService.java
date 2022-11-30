@@ -9,25 +9,30 @@ import ng.temire.mecash.rest.response.GenericResponseDTO;
 import ng.temire.mecash.rest.response.TransactionResponse;
 import ng.temire.mecash.service.mapper.TransactionMapper;
 import ng.temire.mecash.utils.ServiceUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
 @Component
 public class TransactionService {
+
     final TransactionMapper transactionMapper;
-    final TransactionRepository transactionRepository;
-    final ServiceUtils utils;
 
+    @Autowired
+    TransactionRepository transactionRepository;
 
-    public TransactionService(TransactionMapper transactionMapper, TransactionRepository transactionRepository, ServiceUtils utils) {
+    @Autowired
+    ServiceUtils utils;
+
+    public TransactionService(TransactionMapper transactionMapper) {
         this.transactionMapper = transactionMapper;
-        this.transactionRepository = transactionRepository;
-        this.utils = utils;
     }
+
 
     public GenericResponseDTO findUserTxns(TransactionRecordRequest request, Pageable pageable) {
         try {

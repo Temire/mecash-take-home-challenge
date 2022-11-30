@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import ng.temire.mecash.security.constants.Role;
 import ng.temire.mecash.security.exceptions.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;

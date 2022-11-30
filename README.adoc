@@ -9,6 +9,14 @@ To run your application:
 ./mvnw spring-boot:run
 ```
 
+WebService Calls:
+``
+All calls are authorized (JWT) using the Authorization Header
+``
+```
+Authorization: "Bearer {token from login}"
+```
+
 
 
 

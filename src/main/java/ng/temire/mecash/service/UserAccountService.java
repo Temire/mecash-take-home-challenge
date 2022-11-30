@@ -4,8 +4,11 @@ import ng.temire.mecash.data.dto.UserAccountDTO;
 import ng.temire.mecash.data.dto.UserDTO;
 import ng.temire.mecash.data.entity.UserAccount;
 import ng.temire.mecash.data.repository.UserAccountRepository;
+import ng.temire.mecash.rest.response.AccountBalanceResponse;
+import ng.temire.mecash.rest.response.GenericResponseDTO;
 import ng.temire.mecash.service.mapper.UserAccountMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -19,6 +22,7 @@ public class UserAccountService {
 
     final UserAccountRepository userAccountRepository;
     final UserAccountMapper userAccountMapper;
+
     @Value("${currency.A}")
     String currencyA;
     @Value("${currency.A}")
@@ -36,6 +40,27 @@ public class UserAccountService {
             return userAccountMapper.toDto(userAccount.get());
         else
             return null;
+    }
+
+    public UserAccountDTO getAccountByUserId(long number) {
+        Optional<UserAccount> userAccount = userAccountRepository.findByUserId(number);
+        if (userAccount.isPresent())
+            return userAccountMapper.toDto(userAccount.get());
+        else
+            return null;
+    }
+
+    public GenericResponseDTO getAccountBalance(String number) {
+        Optional<UserAccount> userAccount = userAccountRepository.findByNumber(number);
+        if (userAccount.isPresent()){
+            AccountBalanceResponse response = new AccountBalanceResponse();
+            response.setAccount(number);
+            response.setAvailableBalance(userAccount.get().getAvailableBalance());
+            response.setCurrentBalance(userAccount.get().getCurrentBalance());
+            return new GenericResponseDTO("00", HttpStatus.OK, "Account balances returned!.", response);
+        }
+        else
+            return new GenericResponseDTO("99", HttpStatus.NOT_FOUND, "Account not found!.", null);
     }
 
     public UserAccountDTO save(UserAccountDTO accountDTO) {
